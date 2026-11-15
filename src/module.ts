@@ -24,6 +24,7 @@ import {
   addServerPlugin,
   createResolver,
   defineNuxtModule,
+  getNitroVersion,
   getNuxtModuleVersion,
   hasNuxtModule,
   hasNuxtModuleCompatibility,
@@ -904,7 +905,9 @@ export default defineNuxtModule<ModuleOptions>({
     if (nuxt.options.dev) {
       nuxt.hook('nitro:init', (nitro) => {
         nuxt.hooks.hookOnce('build:done', () => {
-          nuxt.hook('pages:resolved', () => nitro.hooks.callHook('rollup:reload'))
+          // Nitro v3 renamed `rollup:reload`, and calling the old name reloads nothing
+          const reloadHook = getNitroVersion(nuxt) === 3 ? 'build:reload' : 'rollup:reload'
+          nuxt.hook('pages:resolved', () => nitro.hooks.callHook(reloadHook as 'rollup:reload'))
         })
       })
     }
